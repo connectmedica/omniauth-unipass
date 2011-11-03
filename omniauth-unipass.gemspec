@@ -14,6 +14,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = OmniAuth::Unipass::VERSION
 
-  gem.add_dependency 'omniauth', '0.3.0'
+  gem.add_dependency 'omniauth', '~> 0.3.2'
   gem.add_dependency 'multi_json'
 end
