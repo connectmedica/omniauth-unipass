@@ -103,7 +103,7 @@ describe OmniAuth::Strategies::Unipass do
     context 'when data is not present in raw info' do
       it 'has nil last_name key' do
         subject.info.should have_key('last_name')
-        subject.info['last_name'].should eq(nil)
+        subject.info['last_name'].should be_nil
       end
     end
 
@@ -134,13 +134,64 @@ describe OmniAuth::Strategies::Unipass do
     it 'returns a Hash' do
       @access_token.stub(:get).with('/me') do
         raw_response = double('Faraday::Response')
-        raw_response.stub(:body) { '{ "spam": "ham" }' }
-        raw_response.stub(:status) { 200 }
-        raw_response.stub(:headers) { { 'Content-Type' => 'application/json' } }
+        raw_response.stub(:body){ '{ "spam": "ham" }' }
+        raw_response.stub(:status){ 200 }
+        raw_response.stub(:headers){ {'Content-Type' => 'application/json'} }
         OAuth2::Response.new(raw_response)
       end
       subject.raw_info.should be_a(Hash)
       subject.raw_info['spam'].should eq('ham')
+    end
+  end
+
+  describe '#credentials' do
+    before :each do
+      @access_token = double('OAuth2::AccessToken')
+      @access_token.stub(:token)
+      @access_token.stub(:expires?)
+      @access_token.stub(:expires_at)
+      @access_token.stub(:refresh_token)
+      subject.stub(:access_token){ @access_token }
+    end
+
+    it 'returns a Hash' do
+      subject.credentials.should be_a(Hash)
+    end
+
+    it 'returns the token' do
+      @access_token.stub(:token){ 'UpU312ZrZIx2-WSt0tyB4YIcObGnhphN-eHSasQOWU6-Le6wj3hbR8bECiJIs_TbdaKiuqWMeFCpXTEo801DwReIvGRR9WVHH0n4yrAdjIkAhZoLI3n_4LgZeGCzhaGM' }
+      subject.credentials['token'].should eq('UpU312ZrZIx2-WSt0tyB4YIcObGnhphN-eHSasQOWU6-Le6wj3hbR8bECiJIs_TbdaKiuqWMeFCpXTEo801DwReIvGRR9WVHH0n4yrAdjIkAhZoLI3n_4LgZeGCzhaGM')
+    end
+
+    it 'returns the expiry status' do
+      @access_token.stub(:expires?){ true }
+      subject.credentials['expires'].should eq(true)
+
+      @access_token.stub(:expires?){ false }
+      subject.credentials['expires'].should eq(false)
+    end
+
+    it 'returns the refresh token and expiry time when expiring' do
+      ten_mins_from_now = (Time.now + 10 * 60).to_i
+      @access_token.stub(:expires?){ true }
+      @access_token.stub(:refresh_token){ 'yM9_7ltgVGTzxbF67sSjgJQz4r1ejE3nkOU63fXJ1ZFw_cst3z4XeEkovXRIAXvr4AmDhk36j1GYhVDbQ4KY4IoDNuix6y3eQGy57eBJaD3wpdplL12l8Q6srGtCD12P' }
+      @access_token.stub(:expires_at){ ten_mins_from_now }
+      subject.credentials['refresh_token'].should eq('yM9_7ltgVGTzxbF67sSjgJQz4r1ejE3nkOU63fXJ1ZFw_cst3z4XeEkovXRIAXvr4AmDhk36j1GYhVDbQ4KY4IoDNuix6y3eQGy57eBJaD3wpdplL12l8Q6srGtCD12P')
+      subject.credentials['expires_at'].should eq(ten_mins_from_now)
+    end
+
+    it 'does not return the refresh token when it is nil and expiring' do
+      @access_token.stub(:expires?){ true }
+      @access_token.stub(:refresh_token){ nil }
+      subject.credentials['refresh_token'].should be_nil
+      subject.credentials.should_not have_key('refresh_token')
+    end
+
+    it 'does not return the refresh token when not expiring' do
+      @access_token.stub(:expires?){ false }
+      @access_token.stub(:refresh_token){ 'zM9_7ltgVGTzxbF67sSjgJQz4r1ejE3nkOU63fXJ1ZFw_cst3z4XeEkovXRIAXvr4AmDhk36j1GYhVDbQ4KY4IoDNuix6y3eQGy57eBJaD3wpdplL12l8Q6srGtCD12P' }
+      subject.credentials['refresh_token'].should be_nil
+      subject.credentials.should_not have_key('refresh_token')
     end
   end
 
