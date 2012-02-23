@@ -10,7 +10,7 @@ module OmniAuth
       option :name, 'unipass'
 
       option :client_options, {
-          :site          => 'https://www.stworzonedlazdrowia.pl/',
+          :site          => 'https://www.stworzonedlazdrowia.pl',
           :api_site      => 'https://www.stworzonedlazdrowia.pl/api/1',
           :authorize_url => '/oauth2/authorize',
           :token_url     => '/oauth2/token'
