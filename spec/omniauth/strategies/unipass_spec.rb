@@ -144,6 +144,21 @@ describe OmniAuth::Strategies::Unipass do
     end
   end
 
+  describe '#extra' do
+    before :each do
+      @raw_info = {'name' => 'Bob Gedlof'}
+      subject.stub(:raw_info){ @raw_info }
+    end
+
+    it 'returns a Hash' do
+      subject.extra.should be_a(Hash)
+    end
+
+    it 'contains raw info' do
+      subject.extra.should eq({'raw_info' => @raw_info})
+    end
+  end
+
   describe '#credentials' do
     before :each do
       @access_token = double('OAuth2::AccessToken')
