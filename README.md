@@ -1,6 +1,6 @@
 # OmniAuth Unipass &nbsp;[![Build Status](https://secure.travis-ci.org/connectmedica/omniauth-unipass.png)][travis]&nbsp;[![Dependency Status](https://gemnasium.com/connectmedica/omniauth-unipass.png?travis)][gemnasium]
 
-Unipass OAuth2 Strategy for OmniAuth 1.0.
+Unipass OAuth2 Strategy for [OmniAuth 1.0](https://github.com/intridea/omniauth) authentication system.
 
 Supports the OAuth 2.0 server-side flow.
 
