@@ -1,28 +1,128 @@
-# OmniAuth GitHub
+# OmniAuth Unipass &nbsp;[![Build Status](https://secure.travis-ci.org/connectmedica/omniauth-unipass.png)][travis]&nbsp;[![Dependency Status](https://gemnasium.com/connectmedica/omniauth-unipass.png?travis)][gemnasium]
 
-This is the official OmniAuth strategy for authenticating to Unipass. 
+Unipass OAuth2 Strategy for [OmniAuth 1.0](https://github.com/intridea/omniauth) authentication system.
 
-## Basic Usage
+Supports the OAuth 2.0 server-side flow.
 
-    use OmniAuth::Builder do
-      provider :unipas, ENV['CLIENT_ID'], ENV['CLIENT_SECRET']
-    end
+[travis]: http://travis-ci.org/connectmedica/omniauth-unipass
+[gemnasium]: https://gemnasium.com/connectmedica/omniauth-unipass
 
-## Advanced Usage
+## Installation
 
-    use OmniAuth::Builder do
-      provider :unipas, ENV['CLIENT_ID'], ENV['CLIENT_SECRET'],
-               :site     => ENV['SITE'],
-               :api_site => ENV['API_SITE'],
-               :setup    => true
-    end
+Add this line to your application's Gemfile:
 
-## License
+    gem 'omniauth-unipass'
 
-Copyright (c) 2011 Connectmedica.com.
+And then execute:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+    $ bundle
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Or install it yourself as:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    $ gem install omniauth-unipass
+
+## Usage
+
+Set up the strategy as a middleware in Ruby on Rails (eg. in `config/initializers/omniauth.rb`):
+
+```ruby
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET']
+end
+```
+
+...or if you are using [Devise-Omniauthable](https://github.com/plataformatec/devise/wiki/OmniAuth:-Overview) (inside your `config/initializers/devise.rb`):
+
+```ruby
+config.omniauth :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET']
+```
+
+## Configuration
+
+You can set application-wide `scope` and `display` options:
+
+```ruby
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET'],
+    :display => 'popup',
+    :scope   => 'email'
+end
+```
+
+...or you can simply pass the `display` parameter for single request:
+
+```ruby
+link_to('Unipass Login', '/auth/unipass?display=mobile')
+```
+
+...or using Devise-Omniauthable helper:
+
+```ruby
+user_omniauth_authorize_path(:unipass, :display => :mobile)
+```
+
+Valid options for `display` parameter are:
+
+* `popup` for streamlined fluid-width layout appropriate for popup windows.
+* `mobile` for minimal, low-bandwidth layout appropriate for mobile devices.
+* ...or leave it blank for standard full-screen layout.
+
+## Client options
+
+If you are testing your application using local (or test) Unipass server, you can customize the path using `client_options`:
+
+```ruby
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET'],
+    :client_options => {
+      :site     => 'https://test.stworzonedlazdrowia.pl',      # Change it to your local Unipass server
+      :api_site => 'https://test.stworzonedlazdrowia.pl/api/1' # Change it to your local Unipass API server
+    }
+```
+
+## Auth Hash
+
+Example of *Auth Hash* available via `request.env['omniauth.auth']`:
+
+```ruby
+{
+  :provider => 'unipass',
+  :id => 'ab123cd456ef',
+  :info => {
+    :name       => 'Stefan Tabory',
+    :first_name => 'Stefan',
+    :last_name  => 'Tabory',
+    :location   => 'mazowieckie'
+  },
+  :credentials => {
+    :token          => 'x_34D-Hd...', # OAuth 2.0 access_token, which you can store in session for later use in API client
+    :refresh_token  => 'zGNMuLR-...', # OAuth 2.0 refresh_token, used to generate new access_tokens
+    :expires_at     => 1321747205,    # when the access token expires (if it expires)
+    :expires        => true           # if you request `offline_access` this will be false
+  },
+  :extra => {
+    :raw_info => {
+      :date_of_birth => '1978-11-24',
+      :first_name    => 'Stefan',
+      :last_name     => 'Tabory',
+      :province      => 'mazowieckie',
+      :sex           => false,
+      :name          => 'Stefan Tabory',
+      :id            => 'ab123cd456ef',
+      :admin         => true
+    }
+  }
+}
+```
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Added some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
+
+## Credits
+
+A big credits go to the authors of [mkdynamic/omniauth-facebook](https://github.com/mkdynamic/omniauth-facebook), on which this strategy is based.

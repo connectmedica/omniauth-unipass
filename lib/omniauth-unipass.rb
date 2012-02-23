@@ -1,2 +1,1 @@
-require "omniauth-unipass/version"
-require 'omniauth/strategies/unipass'
+require 'omniauth/unipass'
