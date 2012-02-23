@@ -46,6 +46,14 @@ module OmniAuth
         @raw_info ||= access_token.get("#{options[:api_site]}/me").parsed
       end
 
+      def callback_url
+        if options.authorize_options.respond_to?(:callback_url)
+          options.authorize_options.callback_url
+        else
+          super
+        end
+      end
+
       def authorize_params
         super.tap do |params|
           params.merge!(:display => request.params['display']) if request.params['display']
