@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 require 'spec_helper'
 require 'omniauth-unipass'
 require 'openssl'
@@ -96,7 +98,7 @@ describe OmniAuth::Strategies::Unipass do
 
   describe '#info' do
     before :each do
-      @raw_info ||= {'first_name' => 'Bob'}
+      @raw_info ||= {'first_name' => 'Bob', 'province' => 'świętokrzyskie'}
       subject.stub(:raw_info){ @raw_info }
     end
 
@@ -116,6 +118,10 @@ describe OmniAuth::Strategies::Unipass do
         @raw_info['last_name'] = 'Gedlof'
         subject.info['last_name'].should eq('Gedlof')
       end
+
+      it 'returns the location' do
+        subject.info['location'].should eq('świętokrzyskie')
+      end
     end
   end
 
@@ -127,12 +133,12 @@ describe OmniAuth::Strategies::Unipass do
 
     it 'performs a GET to https://www.stworzonedlazdrowia.pl/api/1/me' do
       @access_token.stub(:get){ double('OAuth2::Response').as_null_object }
-      @access_token.should_receive(:get).with('/me')
+      @access_token.should_receive(:get).with('https://www.stworzonedlazdrowia.pl/api/1/me')
       subject.raw_info
     end
 
     it 'returns a Hash' do
-      @access_token.stub(:get).with('/me') do
+      @access_token.stub(:get).with('https://www.stworzonedlazdrowia.pl/api/1/me') do
         raw_response = double('Faraday::Response')
         raw_response.stub(:body){ '{ "spam": "ham" }' }
         raw_response.stub(:status){ 200 }

@@ -7,8 +7,6 @@ module OmniAuth
     class Unipass < OmniAuth::Strategies::OAuth2
       DEFAULT_SCOPE = 'email'
 
-      option :name, 'unipass'
-
       option :client_options, {
           :site          => 'https://www.stworzonedlazdrowia.pl',
           :api_site      => 'https://www.stworzonedlazdrowia.pl/api/1',
@@ -28,7 +26,8 @@ module OmniAuth
       info do
         {
             'first_name' => raw_info['first_name'],
-            'last_name'  => raw_info['last_name']
+            'last_name'  => raw_info['last_name'],
+            'location'   => raw_info['province']
         }
       end
 
@@ -39,7 +38,7 @@ module OmniAuth
       end
 
       def raw_info
-        @raw_info ||= access_token.get("#{options[:api_site]}/me").parsed
+        @raw_info ||= access_token.get("#{options[:client_options][:api_site]}/me").parsed
       end
 
       def callback_url
@@ -59,7 +58,7 @@ module OmniAuth
       end
 
       def access_token_options
-        options.access_token_options.inject({}) { |h,(k,v)| h[k.to_sym] = v; h }
+        options.access_token_options.inject({}){ |h,(k,v)| h[k.to_sym] = v; h }
       end
 
     end
