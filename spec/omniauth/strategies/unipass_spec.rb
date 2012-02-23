@@ -84,4 +84,14 @@ describe OmniAuth::Strategies::Unipass do
     end
   end
 
+  describe '#uid' do
+    before :each do
+      subject.stub(:raw_info){ {'id' => 'unipass-randomrandom'} }
+    end
+
+    it 'returns the id from raw_info' do
+      subject.uid.should eq('unipass-randomrandom')
+    end
+  end
+
 end
