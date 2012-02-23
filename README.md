@@ -23,21 +23,95 @@ Or install it yourself as:
 
 ## Usage
 
+Set up the strategy as a middleware in Ruby on Rails:
+
 ```ruby
-use OmniAuth::Builder do
-  provider :unipas, ENV['CLIENT_ID'], ENV['CLIENT_SECRET']
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET']
 end
 ```
 
-More options:
+...or if you are using Devise-Omniauthable (inside your `config/initializers/devise.rb`):
 
 ```ruby
-use OmniAuth::Builder do
-  provider :unipas, ENV['CLIENT_ID'], ENV['CLIENT_SECRET'],
-           :site     => ENV['SITE'],
-           :api_site => ENV['API_SITE'],
-           :setup    => true
+config.omniauth :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET']
+```
+
+## Configuration
+
+You can set application-wide `scope` and `display` options:
+
+```ruby
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET'],
+    :display => 'popup',
+    :scope   => 'email'
 end
+```
+
+...or you can simply pass the `display` parameter for single request:
+
+```ruby
+/auth/unipass?display=mobile
+```
+
+...or using Devise-Omniauthable helper:
+
+```ruby
+user_omniauth_authorize_path(:unipass, :display => :mobile)
+```
+
+Valid options for `display` parameter are:
+
+* `popup` for streamlined fluid-width layout appropriate for popup windows.
+* `mobile` for minimal, low-bandwidth layout appropriate for mobile devices.
+* ...or leave it blank for standard full-screen layout.
+
+## Client options
+
+If you are testing your application using local (or test) Unipass server, you can customize the path using `client_options`:
+
+```ruby
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET'],
+    :client_options => {
+      :site     => 'https://test.stworzonedlazdrowia.pl',      # You can change it to your local Unipass server
+      :api_site => 'https://test.stworzonedlazdrowia.pl/api/1' # You can change it to your local Unipass API server
+    }
+```
+
+## Auth Hash
+
+Example of *Auth Hash* available via `request.env['omniauth.auth']`:
+
+```ruby
+{
+  :provider => 'unipass',
+  :id => 'ab123cd456ef',
+  :info => {
+    :name       => 'Stefan Tabory',
+    :first_name => 'Stefan',
+    :last_name  => 'Tabory',
+    :location   => 'mazowieckie'
+  },
+  :credentials => {
+    :token      => 'x_34D-Hd...', # OAuth 2.0 access_token, which could be stored in session for later use in API client
+    :expires_at => 1321747205,    # when the access token expires (if it expires)
+    :expires    => true           # if you request `offline_access` this will be false
+  },
+  :extra => {
+    :raw_info => {
+      :date_of_birth => '1978-11-24',
+      :first_name    => 'Stefan',
+      :last_name     => 'Tabory',
+      :province      => 'mazowieckie',
+      :sex           => false,
+      :name          => 'Stefan Tabory',
+      :id            => 'ab123cd456ef',
+      :admin         => true
+    }
+  }
+}
 ```
 
 ## Contributing
