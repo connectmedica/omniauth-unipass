@@ -4,8 +4,8 @@ require File.expand_path('../lib/omniauth/unipass/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ['Aleksadner Dąbrowski', 'Karol Sarnacki']
   gem.email         = ['aleksander.dabrowski@connectmedica.com', 'sodercober@gmail.com']
-  gem.description   = %q{Unipass strategy for OmniAuth 1.0}
-  gem.summary       = %q{Unipass strategy for OmniAuth 1.0}
+  gem.description   = %q{Unipass OAuth2 Strategy for OmniAuth 1.0}
+  gem.summary       = %q{Unipass OAuth2 Strategy for OmniAuth 1.0}
   gem.homepage      = 'https://github.com/connectmedica/omniauth-unipass'
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
