@@ -94,4 +94,29 @@ describe OmniAuth::Strategies::Unipass do
     end
   end
 
+  describe '#info' do
+    before :each do
+      @raw_info ||= {'first_name' => 'Bob'}
+      subject.stub(:raw_info){ @raw_info }
+    end
+
+    context 'when data is not present in raw info' do
+      it 'has nil last_name key' do
+        subject.info.should have_key('last_name')
+        subject.info['last_name'].should eq(nil)
+      end
+    end
+
+    context 'when data is present in raw info' do
+      it 'returns the first_name' do
+        subject.info['first_name'].should eq('Bob')
+      end
+
+      it 'returns the last_name' do
+        @raw_info['last_name'] = 'Gedlof'
+        subject.info['last_name'].should eq('Gedlof')
+      end
+    end
+  end
+
 end
