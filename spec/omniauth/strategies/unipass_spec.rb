@@ -80,10 +80,6 @@ describe OmniAuth::Strategies::Unipass do
     it 'has correct param name by default' do
       subject.access_token_options[:param_name].should eq('oauth_token')
     end
-
-    it 'has correct header format by default' do
-      subject.access_token_options[:header_format].should eq('Bearer %s')
-    end
   end
 
   describe '#uid' do
