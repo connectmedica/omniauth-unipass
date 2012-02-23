@@ -16,10 +16,6 @@ module OmniAuth
           :token_url     => '/oauth2/token'
       }
 
-      option :token_params, {
-          :parse => :query
-      }
-
       option :access_token_options, {
           :header_format => 'OAuth %s',
           :param_name    => 'oauth_token'

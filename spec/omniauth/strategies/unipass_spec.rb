@@ -68,7 +68,7 @@ describe OmniAuth::Strategies::Unipass do
     end
 
     it 'includes state parameter from request when present' do
-      @request.stub(:params){ {'state' => 'my_state'git} }
+      @request.stub(:params){ {'state' => 'my_state'} }
       subject.authorize_params.should be_a(Hash)
       subject.authorize_params[:state].should eq('my_state')
     end
