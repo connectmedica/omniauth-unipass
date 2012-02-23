@@ -23,7 +23,7 @@ Or install it yourself as:
 
 ## Usage
 
-Set up the strategy as a middleware in Ruby on Rails:
+Set up the strategy as a middleware in Ruby on Rails (eg. in `config/initializers/omniauth.rb`):
 
 ```ruby
 Rails.application.config.middleware.use OmniAuth::Builder do
@@ -31,7 +31,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 end
 ```
 
-...or if you are using Devise-Omniauthable (inside your `config/initializers/devise.rb`):
+...or if you are using [Devise-Omniauthable](https://github.com/plataformatec/devise/wiki/OmniAuth:-Overview) (inside your `config/initializers/devise.rb`):
 
 ```ruby
 config.omniauth :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET']
@@ -52,7 +52,7 @@ end
 ...or you can simply pass the `display` parameter for single request:
 
 ```ruby
-/auth/unipass?display=mobile
+link_to('Unipass Login', '/auth/unipass?display=mobile')
 ```
 
 ...or using Devise-Omniauthable helper:
@@ -75,8 +75,8 @@ If you are testing your application using local (or test) Unipass server, you ca
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :unipass, ENV['UNIPASS_CLIENT_ID'], ENV['UNIPASS_CLIENT_SECRET'],
     :client_options => {
-      :site     => 'https://test.stworzonedlazdrowia.pl',      # You can change it to your local Unipass server
-      :api_site => 'https://test.stworzonedlazdrowia.pl/api/1' # You can change it to your local Unipass API server
+      :site     => 'https://test.stworzonedlazdrowia.pl',      # Change it to your local Unipass server
+      :api_site => 'https://test.stworzonedlazdrowia.pl/api/1' # Change it to your local Unipass API server
     }
 ```
 
@@ -95,9 +95,10 @@ Example of *Auth Hash* available via `request.env['omniauth.auth']`:
     :location   => 'mazowieckie'
   },
   :credentials => {
-    :token      => 'x_34D-Hd...', # OAuth 2.0 access_token, which could be stored in session for later use in API client
-    :expires_at => 1321747205,    # when the access token expires (if it expires)
-    :expires    => true           # if you request `offline_access` this will be false
+    :token          => 'x_34D-Hd...', # OAuth 2.0 access_token, which you can store in session for later use in API client
+    :refresh_token  => 'zGNMuLR-...', # OAuth 2.0 refresh_token, used to generate new access_tokens
+    :expires_at     => 1321747205,    # when the access token expires (if it expires)
+    :expires        => true           # if you request `offline_access` this will be false
   },
   :extra => {
     :raw_info => {
