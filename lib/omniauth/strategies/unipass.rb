@@ -17,7 +17,7 @@ module OmniAuth
       }
 
       option :access_token_options, {
-          :header_format => 'OAuth %s',
+          :header_format => 'Bearer %s',
           :param_name    => 'oauth_token'
       }
 
@@ -56,6 +56,10 @@ module OmniAuth
           params.merge!(:state   => request.params['state'])   if request.params['state']
           params[:scope] ||= DEFAULT_SCOPE
         end
+      end
+
+      def access_token_options
+        options.access_token_options.inject({}) { |h,(k,v)| h[k.to_sym] = v; h }
       end
 
     end
