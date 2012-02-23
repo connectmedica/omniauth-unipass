@@ -1,48 +1,57 @@
-require 'omniauth/oauth'
-require 'multi_json'
+require 'omniauth/strategies/oauth2'
+require 'base64'
+require 'openssl'
 
 module OmniAuth
   module Strategies
     class Unipass < OmniAuth::Strategies::OAuth2
+      DEFAULT_SCOPE = 'email'
 
-      def initialize(app, client_id = nil, client_secret = nil, options = {}, &block)
-        options   = options.dup
-        name      = options.delete(:name)     || 'unipass'
-        @site     = options.delete(:site)     || 'http://test.stworzonedlazdrowia.pl/'
-        @api_site = options.delete(:api_site) || 'http://test.stworzonedlazdrowia.pl/api/1'
+      option :name, 'unipass'
 
-        client_options = {
-          :site          => @site,
+      option :client_options, {
+          :site          => 'https://www.stworzonedlazdrowia.pl/',
+          :api_site      => 'https://www.stworzonedlazdrowia.pl/api/1',
           :authorize_url => '/oauth2/authorize',
           :token_url     => '/oauth2/token'
-        }.merge(options[:client_options] || {})
+      }
 
-        super(app, name, client_id, client_secret, client_options, options, &block)
-      end
+      option :token_params, {
+          :parse => :query
+      }
 
-      protected
+      option :access_token_options, {
+          :header_format => 'OAuth %s',
+          :param_name    => 'oauth_token'
+      }
 
-      def auth_hash
-        OmniAuth::Utils.deep_merge(super, {
-          'uid'       => user_data['id'],
-          'user_info' => user_info,
-          'extra'     => {'user_hash' => user_data}
-        })
-      end
+      option :authorize_options, [:scope, :display]
 
-      def user_info
+      uid { raw_info['id'] }
+
+      info do
         {
-          'first_name' => user_data['first_name'],
-          'last_name'  => user_data['last_name']
+            'first_name' => raw_info['first_name'],
+            'last_name'  => raw_info['last_name']
         }
       end
 
-      def user_data
-        session[:access_token]            = @access_token.token
-        session[:access_token_expires_at] = @access_token.expires_at
-        session[:refresh_token]           = @access_token.refresh_token
+      extra do
+        {
+            'raw_info' => raw_info
+        }
+      end
 
-        @data ||= MultiJson.decode(@access_token.get("#{@api_site}/me").response.env[:body])
+      def raw_info
+        @raw_info ||= access_token.get("#{options[:api_site]}/me").parsed
+      end
+
+      def authorize_params
+        super.tap do |params|
+          params.merge!(:display => request.params['display']) if request.params['display']
+          params.merge!(:state   => request.params['state'])   if request.params['state']
+          params[:scope] ||= DEFAULT_SCOPE
+        end
       end
 
     end
