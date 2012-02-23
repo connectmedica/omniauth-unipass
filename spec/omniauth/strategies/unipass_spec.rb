@@ -110,6 +110,11 @@ describe OmniAuth::Strategies::Unipass do
         subject.info['first_name'].should eq('Bob')
       end
 
+      it 'returns the name' do
+        @raw_info['name'] = 'Bob Gedlof'
+        subject.info['name'].should eq('Bob Gedlof')
+      end
+
       it 'returns the last_name' do
         @raw_info['last_name'] = 'Gedlof'
         subject.info['last_name'].should eq('Gedlof')

@@ -24,6 +24,7 @@ module OmniAuth
 
       info do
         {
+            'name'       => raw_info['name'],
             'first_name' => raw_info['first_name'],
             'last_name'  => raw_info['last_name'],
             'location'   => raw_info['province']
